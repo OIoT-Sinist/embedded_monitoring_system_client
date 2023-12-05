@@ -1,9 +1,10 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div :class="className" :style="{ width: width }" />
 </template>
 
 <script>
 import * as echarts from 'echarts'
+import { warnState } from "@/api/iot/deviceLog";
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
 
@@ -25,9 +26,12 @@ export default {
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      warnNumber: 0,
+      noWarnNumber: 0
     }
   },
+
   mounted() {
     this.$nextTick(() => {
       this.initChart()
@@ -43,37 +47,37 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-
-      this.chart.setOption({
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          left: 'center',
-          bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
-        },
-        series: [
-          {
-            name: 'WEEKLY WRITE ARTICLES',
-            type: 'pie',
-            roseType: 'radius',
-            radius: [15, 95],
-            center: ['50%', '38%'],
-            data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
-            ],
-            animationEasing: 'cubicInOut',
-            animationDuration: 2600
-          }
-        ]
+    // 当前警告个数
+      warnState().then(res => {
+        this.warnNumber = res.data.ExceedsTheThreshold
+        this.noWarnNumber = res.data.ThresholdNotExceeded
+        this.chart.setOption({
+          tooltip: {
+            trigger: 'item'
+          },
+          color: ['#ee6666', '#91cb74'],
+          series: [
+            {
+              name: '设备状态',
+              type: 'pie',
+              radius: '50%',
+              data: [
+                { value: this.warnNumber, name: '当前警告状态设备' },
+                { value: this.noWarnNumber, name: '当前非警告状态设备' },
+              ],
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            },
+          ],
+        })
       })
     }
   }
 }
 </script>
+<style lang="scss" scoped></style>
