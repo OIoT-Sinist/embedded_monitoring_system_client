@@ -1,212 +1,130 @@
-
 <template>
-  <div id="app">
-    <div class="text">
-      <div>
-        <span>搜索：</span>
-        <el-select
-          v-model="keywords"
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入关键词地址"
-          :remote-method="remoteMethod"
-          :loading="loading"
-          :clearable="true"
-          size="mini"
-          @change="currentSelect"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.id + item.adcode"
-            :label="item.name"
-            :value="item"
-            class="one-text"
-          >
-            <span style="float: left">{{ item.name }}</span>
-            <span style="float: right; color: #8492a6; font-size: 13px">{{
-              item.district
-            }}</span>
-          </el-option>
-        </el-select>
-      </div>
-      <div class="info-box">
-        <div>经度：{{ form.lng }}</div>
-        <div>纬度：{{ form.lat }}</div>
-        <div>详细地址：{{ form.address }}</div>
-      </div>
-    </div>
-    <div id="container" class="container"></div>
-    
+  <div>
+    <div id="container"></div>
   </div>
 </template>
- 
 <script>
 import AMapLoader from "@amap/amap-jsapi-loader";
+import { listDeviceLog } from "@/api/iot/deviceLog"
+
+import { reverse, uniqBy } from "lodash";// npm i lodash --save 操作数组插件 https://lodash.shujuwajue.com/array/reverse
+
 window._AMapSecurityConfig = {
   // 安全密钥
   securityJsCode: "0f5c6bb3d88fb7c9934498c22b0b7260",
 };
 export default {
-  name: "TestIndex",
   data() {
     return {
-      // 地图实例
-      map: null,
-      // 标记点
-      marker: "",
-      // 地址逆解析
-      geoCoder: null,
-      // 搜索提示
-      AutoComplete: null,
-      // 搜索关键字
-      keywords: "",
-      // 位置信息
-      form: {
-        lng: "",
-        lat: "",
-        address: "",
-        adcode: "", //地区编码
-      },
-      // 搜索节流阀
-      loading: false,
-      // 搜索提示信息
-      options: [],
-    };
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        deviceName: undefined,
+        locationLatitude: undefined,
+        locationLogitude: undefined,
+        co2Range: undefined,
+        alarmThreshold: undefined,
+        luminanceRange: undefined,
+        humidityRange: undefined,
+        tempratureRange: undefined,
+      }
+    }
   },
   methods: {
-    initMap() {
+    map() {
+      // 跳转
+      let jump = this.$router
+
       AMapLoader.reset()
       AMapLoader.load({
-        // 申请的Key
-        key: "e70997f50b4c02bfc3fe258a67222adf",
-        version: "2.0",
+        key: "e70997f50b4c02bfc3fe258a67222adf", //申请好的Web端开发者 Key，调用 load 时必填
+        version: "2.0", //指定要加载的 JS API 的版本，缺省时默认为 1.4.15
         // 需要用到的插件
         plugins: ["AMap.Geocoder", "AMap.AutoComplete"],
       })
         .then((AMap) => {
-          this.map = new AMap.Map("container", {
+          const map = new AMap.Map("container", {
             viewMode: "3D", //是否为3D地图模式
-            zoom: 12, //初始化地图级别
+            mapStyle: 'amap://styles/whitesmoke',
+            zoom: 6, //初始化地图级别
             center: [104.074043, 30.551491], //初始化地图中心点位置
           });
-          //地址逆解析插件
-          this.geoCoder = new AMap.Geocoder({
-            city: "010", //城市设为北京，默认：“全国”
-            radius: 1000, //范围，默认：500
+
+          // 正常的图标
+          const icon1 = {
+            type: 'image', // 图标类型，现阶段只支持 image 类型
+            image: 'https://webapi.amap.com/images/mass/mass1.png', // 图片 url
+            size: [40, 40],// 图片尺寸
+            anchor: 'center' // 图片相对 position 的锚点，默认为 bottom-center 
+          };
+          // 异常的图标
+          const icon2 = {
+            type: 'image', // 图标类型，现阶段只支持 image 类型
+            image: 'https://webapi.amap.com/images/mass/mass0.png', // 图片 url
+            size: [40, 40],// 图片尺寸
+            anchor: 'center' // 图片相对 position 的锚点，默认为 bottom-center 
+          };
+          listDeviceLog().then(res => {
+            if (res.rows) {
+              // JSON数组倒序
+              let arr = reverse(res.rows);
+              // JSON数组去重
+              arr = uniqBy(res.rows, 'deviceName');
+
+              arr.forEach((v) => {
+
+                const normal = {
+                  content: v.deviceName, // 要展示的文字内容
+                  direction: 'right', // 文字方向，有 icon 时为围绕文字的方向，没有 icon 时，则为相对 position 的位置
+                  offset: [0, -3], // 在 direction 基础上的偏移量
+                  style: { // 文字样式       
+                    fontSize: 14,// 字体大小        
+                    fillColor: '#22886f', // 字体颜色
+                    strokeColor: '#fff', // 描边颜色
+                    strokeWidth: 2,  // 描边宽度
+                  }
+                }
+                // 标点
+                let labelsMarker = new AMap.LabelMarker({
+                  name: '标注', // 此属性非绘制文字内容，仅最为标识使用
+                  position: [v.locationLatitude, v.locationLogitude],
+                  zIndex: 16,
+                  icon: v.hasError == 0 ? icon1 : icon2, // 将第一步创建的 icon 对象传给 icon 属性
+                  text: normal,// 将第二步创建的 text 对象传给 text 属性
+                });
+                const labelsLayer = new AMap.LabelsLayer({
+                  zooms: [3, 20],
+                  zIndex: 1000,
+                  collision: true,  // 该层内标注是否避让
+                  allowCollision: true, // 设置 allowCollision：true，可以让标注避让用户的标注
+                });
+
+                // 添加labelMarker数组
+                labelsLayer.add(labelsMarker)
+                map.add(labelsLayer);
+                // 点击跳转到设备配置
+                labelsMarker.on("click", function (e) {
+                  jump.push('/device/deviceConfig')
+                });
+              })
+            }
           });
-          // 搜索提示插件
-          this.AutoComplete = new AMap.AutoComplete({ city: "全国" });
-          //点击获取经纬度;
-          this.map.on("click", (e) => {
-            // 获取经纬度
-            this.form.lng = e.lnglat.lng;
-            this.form.lat = e.lnglat.lat;
-            // 清除点
-            this.removeMarker();
-            // 标记点
-            this.setMapMarker();
-          });
+
         })
-        .catch((err) => {
-          // 错误
-          console.log(err);
+        .catch((e) => {
+          console.error(e); //加载错误提示
         });
-    },
-    // 标记点
-    setMapMarker() {
-      // 自动适应显示想显示的范围区域
-      this.map.setFitView();
-      this.marker = new AMap.Marker({
-        map: this.map,
-        position: [this.form.lng, this.form.lat],
-      });
-      // 逆解析地址
-      this.toGeoCoder();
-      this.map.setFitView();
-      this.map.add(this.marker);
-    },
-    // 清除点
-    removeMarker() {
-      if (this.marker) {
-        this.map.remove(this.marker);
-      }
-    },
-    // 逆解析地址
-    toGeoCoder() {
-      let lnglat = [this.form.lng, this.form.lat];
-      this.geoCoder.getAddress(lnglat, (status, result) => {
-        if (status === "complete" && result.regeocode) {
-          this.form.address = result.regeocode.formattedAddress;
-        }
-      });
-    },
-    // 搜索
-    remoteMethod(query) {
-      if (query !== "") {
-        this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-          this.AutoComplete.search(query, (status, result) => {
-            this.options = result.tips;
-          });
-        }, 200);
-      } else {
-        this.options = [];
-      }
-    },
-    // 选中提示
-    currentSelect(val) {
-      // 清空时不执行后面代码
-      if (!val) {
-        return;
-      }
-      this.form = {
-        lng: val.location.lng,
-        lat: val.location.lat,
-        address: val.district + val.address,
-        adcode: val.adcode,
-      };
-      // 清除点
-      this.removeMarker();
-      // 标记点
-      this.setMapMarker();
     },
   },
   mounted() {
-    this.initMap();
-  },
-};
-</script>
- 
-<style>
-#app {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.text {
-  font-size: 15px;
-  position: absolute;
-  left: 20px;
-  top: 20px;
-  z-index: 100;
-  .el-input {
-    width: 250px;
+    this.map()
   }
 }
-.container {
-  width: 100%;
+</script>
+
+<style lang="scss" scoped>
+#container {
+  width: 100vw;
   height: 100vh;
 }
-@media (min-width:1000px) {
-  .text {
-    font-size: 18px;
-    position: absolute;
-    .el-input {
-      width: 400px;
-    }
-  }
-}
-
 </style>
