@@ -1,77 +1,37 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="设备名" prop="deviceName">
-        <el-input
-          v-model="queryParams.deviceName"
-          placeholder="请输入设备名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="设备id" label-width="100px" prop="deviceId">
+        <el-input v-model="queryParams.deviceId" placeholder="请输入设备名" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="co2" prop="co2">
-        <el-input
-          v-model="queryParams.co2"
-          placeholder="请输入co2"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="设备名" label-width="100px" prop="deviceName">
+        <el-input v-model="queryParams.deviceName" placeholder="请输入设备名" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="亮度" prop="luminance">
-        <el-input
-          v-model="queryParams.luminance"
-          placeholder="请输入亮度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="co2" label-width="100px" prop="co2">
+        <el-input v-model="queryParams.co2" placeholder="请输入co2" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="湿度" prop="humidity">
-        <el-input
-          v-model="queryParams.humidity"
-          placeholder="请输入湿度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="亮度" label-width="100px" prop="luminance">
+        <el-input v-model="queryParams.luminance" placeholder="请输入亮度" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="温度" prop="temprature">
-        <el-input
-          v-model="queryParams.temprature"
-          placeholder="请输入温度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="湿度" label-width="100px" prop="humidity">
+        <el-input v-model="queryParams.humidity" placeholder="请输入湿度" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="位置纬度" prop="locationLatitude">
-        <el-input
-          v-model="queryParams.locationLatitude"
-          placeholder="请输入位置纬度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="温度" label-width="100px" prop="temprature">
+        <el-input v-model="queryParams.temprature" placeholder="请输入温度" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="位置经度" prop="locationLogitude">
-        <el-input
-          v-model="queryParams.locationLogitude"
-          placeholder="请输入位置经度"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="位置纬度" label-width="100px" prop="locationLatitude">
+        <el-input v-model="queryParams.locationLatitude" placeholder="请输入位置纬度" clearable
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="是否超出阈值" prop="hasError">
-        <el-input
-          v-model="queryParams.hasError"
-          placeholder="请输入是否超出阈值"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="位置经度" label-width="100px" prop="locationLogitude">
+        <el-input v-model="queryParams.locationLogitude" placeholder="请输入位置经度" clearable
+          @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="自定义数据" prop="customData">
-        <el-input
-          v-model="queryParams.customData"
-          placeholder="请输入自定义数据"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="是否超出阈值" label-width="100px" prop="hasError">
+        <el-input v-model="queryParams.hasError" placeholder="请输入是否超出阈值" clearable @keyup.enter.native="handleQuery" />
+      </el-form-item>
+      <el-form-item label="自定义数据" label-width="100px" prop="customData">
+        <el-input v-model="queryParams.customData" placeholder="请输入自定义数据" clearable @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -81,53 +41,28 @@
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:deviceLog:add']"
-        >新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+          v-hasPermi="['system:deviceLog:add']">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:deviceLog:edit']"
-        >修改</el-button>
+        <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate"
+          v-hasPermi="['system:deviceLog:edit']">修改</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:deviceLog:remove']"
-        >删除</el-button>
+        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete"
+          v-hasPermi="['system:deviceLog:remove']">删除</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:deviceLog:export']"
-        >导出</el-button>
+        <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+          v-hasPermi="['system:deviceLog:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="deviceLogList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="id" v-if="true"/>
+      <el-table-column label="id" align="center" prop="id" v-if="true" />
+      <el-table-column label="设备id" align="center" prop="deviceId" v-if="true" />
       <el-table-column label="设备名" align="center" prop="deviceName" />
       <el-table-column label="co2" align="center" prop="co2" />
       <el-table-column label="亮度" align="center" prop="luminance" />
@@ -139,35 +74,20 @@
       <el-table-column label="自定义数据" align="center" prop="customData" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:deviceLog:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:deviceLog:remove']"
-          >删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+            v-hasPermi="['system:deviceLog:edit']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+            v-hasPermi="['system:deviceLog:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+      @pagination="getList" />
 
     <!-- 添加或修改设备日志对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="设备名" prop="deviceName">
           <el-input v-model="form.deviceName" placeholder="请输入设备名" />
         </el-form-item>
@@ -190,7 +110,10 @@
           <el-input v-model="form.locationLogitude" placeholder="请输入位置经度" />
         </el-form-item>
         <el-form-item label="是否超出阈值" prop="hasError">
-          <el-input v-model="form.hasError" placeholder="请输入是否超出阈值" />
+          <el-select v-model="form.hasError" placeholder="请选择是否超出阈值">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="自定义数据" prop="customData">
           <el-input v-model="form.customData" placeholder="请输入自定义数据" />
@@ -211,6 +134,13 @@ export default {
   name: "DeviceLog",
   data() {
     return {
+      options: [{
+          value: '1',
+          label: '是'
+        }, {
+          value: '0',
+          label: '否'
+      }],
       // 按钮loading
       buttonLoading: false,
       // 遮罩层
@@ -291,6 +221,13 @@ export default {
       this.loading = true;
       listDeviceLog(this.queryParams).then(response => {
         this.deviceLogList = response.rows;
+        this.deviceLogList.forEach(v => {
+          if (v.hasError === 0) {
+            v.hasError = "否"
+          } else {
+            v.hasError = "是"
+          }
+        })
         this.total = response.total;
         this.loading = false;
       });
@@ -333,7 +270,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -348,10 +285,17 @@ export default {
       this.reset();
       const id = row.id || this.ids
       getDeviceLog(id).then(response => {
+        console.log(response)
         this.loading = false;
         this.form = response.data;
+        console.log(this.form)
         this.open = true;
         this.title = "修改设备日志";
+        if (this.form.hasError === 0) {
+            this.form.hasError = "否"
+          } else {
+            this.form.hasError = "是"
+        }
       });
     },
     /** 提交按钮 */
@@ -360,6 +304,12 @@ export default {
         if (valid) {
           this.buttonLoading = true;
           if (this.form.id != null) {
+            if (this.form.hasError === "否") {
+                this.form.hasError = '0'
+            }
+            if (this.form.hasError === "是") {
+                this.form.hasError = '1'
+            }
             updateDeviceLog(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
@@ -403,3 +353,8 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+  ::v-deep .el-select {
+    width: 100%;
+  }
+</style>

@@ -1,7 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="位置纬度" prop="locationLatitude">
+      <el-form-item label="设备名" label-width="100px" prop="deviceName">
+        <el-input v-model="queryParams.deviceName" placeholder="请输入设备名" clearable @keyup.enter.native="handleQuery" />
+      </el-form-item>
+      <el-form-item label="位置纬度" label-width="100px" prop="locationLatitude">
         <el-input
           v-model="queryParams.locationLatitude"
           placeholder="请输入位置纬度"
@@ -9,7 +12,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="位置经度" prop="locationLogitude">
+      <el-form-item label="位置经度" label-width="100px" prop="locationLogitude">
         <el-input
           v-model="queryParams.locationLogitude"
           placeholder="请输入位置经度"
@@ -17,7 +20,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="co2范围" prop="co2Range">
+      <el-form-item label="阈值" label-width="100px" prop="alarmThreshold">
+        <el-input v-model="queryParams.alarmThreshold" placeholder="阈值" clearable @keyup.enter.native="handleQuery" />
+      </el-form-item>
+      <el-form-item label="co2范围" label-width="100px" prop="co2Range">
         <el-input
           v-model="queryParams.co2Range"
           placeholder="请输入co2范围"
@@ -25,7 +31,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="亮度范围" prop="luminanceRange">
+      <el-form-item label="亮度范围" label-width="100px" prop="luminanceRange">
         <el-input
           v-model="queryParams.luminanceRange"
           placeholder="请输入亮度范围"
@@ -33,7 +39,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="湿度范围" prop="humidityRange">
+      <el-form-item label="湿度范围" label-width="100px" prop="humidityRange">
         <el-input
           v-model="queryParams.humidityRange"
           placeholder="请输入湿度范围"
@@ -41,7 +47,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="温度范围" prop="tempratureRange">
+      <el-form-item label="温度范围" label-width="100px" prop="tempratureRange">
         <el-input
           v-model="queryParams.tempratureRange"
           placeholder="请输入温度范围"
@@ -104,8 +110,10 @@
     <el-table v-loading="loading" :data="deviceConfigList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" v-if="true"/>
+      <el-table-column label="设备名" align="center" prop="deviceName" />
       <el-table-column label="位置纬度" align="center" prop="locationLatitude" />
       <el-table-column label="位置经度" align="center" prop="locationLogitude" />
+      <el-table-column label="阈值" align="center" prop="alarmThreshold" />
       <el-table-column label="co2范围" align="center" prop="co2Range" />
       <el-table-column label="亮度范围" align="center" prop="luminanceRange" />
       <el-table-column label="湿度范围" align="center" prop="humidityRange" />
@@ -141,11 +149,17 @@
     <!-- 添加或修改设备配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="设备名" prop="deviceName">
+          <el-input v-model="form.deviceName" placeholder="请输入设备名" />
+        </el-form-item>
         <el-form-item label="位置纬度" prop="locationLatitude">
           <el-input v-model="form.locationLatitude" placeholder="请输入位置纬度" />
         </el-form-item>
         <el-form-item label="位置经度" prop="locationLogitude">
           <el-input v-model="form.locationLogitude" placeholder="请输入位置经度" />
+        </el-form-item>
+        <el-form-item label="阈值" prop="alarmThreshold">
+          <el-input v-model="form.alarmThreshold" placeholder="请输入阈值" />
         </el-form-item>
         <el-form-item label="co2范围" prop="co2Range">
           <el-input v-model="form.co2Range" placeholder="请输入co2范围" />
@@ -199,9 +213,11 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        deviceName: undefined,
         locationLatitude: undefined,
         locationLogitude: undefined,
         co2Range: undefined,
+        alarmThreshold: undefined,
         luminanceRange: undefined,
         humidityRange: undefined,
         tempratureRange: undefined,
@@ -213,11 +229,17 @@ export default {
         id: [
           { required: true, message: "id不能为空", trigger: "blur" }
         ],
+        deviceName: [
+          { required: true, message: "设备名不能为空", trigger: "blur" }
+        ],
         locationLatitude: [
           { required: true, message: "位置纬度不能为空", trigger: "blur" }
         ],
         locationLogitude: [
           { required: true, message: "位置经度不能为空", trigger: "blur" }
+        ],
+        alarmThreshold: [
+          { required: true, message: "阈值不能为空", trigger: "blur" }
         ],
         co2Range: [
           { required: true, message: "co2范围不能为空", trigger: "blur" }
@@ -242,6 +264,7 @@ export default {
     getList() {
       this.loading = true;
       listDeviceConfig(this.queryParams).then(response => {
+        console.log(response,1)
         this.deviceConfigList = response.rows;
         this.total = response.total;
         this.loading = false;
