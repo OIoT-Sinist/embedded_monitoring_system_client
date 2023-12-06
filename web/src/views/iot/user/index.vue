@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户名" prop="username">
+      <el-form-item label="用户名" label-width="100px" prop="username">
         <el-input
           v-model="queryParams.username"
           placeholder="请输入用户名"
@@ -9,15 +9,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input
-          v-model="queryParams.password"
-          placeholder="请输入密码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="手机号" prop="phone">
+      <el-form-item label="手机号" label-width="100px" prop="phone">
         <el-input
           v-model="queryParams.phone"
           placeholder="请输入手机号"
@@ -25,7 +17,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="邮箱" prop="email">
+      <el-form-item label="邮箱" label-width="100px" prop="email">
         <el-input
           v-model="queryParams.email"
           placeholder="请输入邮箱"
@@ -33,7 +25,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="可见范围" prop="ground">
+      <el-form-item label="可见范围" label-width="100px" prop="ground">
         <el-input
           v-model="queryParams.ground"
           placeholder="请输入可见范围"
@@ -97,7 +89,6 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="userId" v-if="true"/>
       <el-table-column label="用户名" align="center" prop="username" />
-      <el-table-column label="密码" align="center" prop="password" />
       <el-table-column label="用户类型" align="center" prop="type" />
       <el-table-column label="手机号" align="center" prop="phone" />
       <el-table-column label="邮箱" align="center" prop="email" />
@@ -136,9 +127,6 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码" />
-        </el-form-item>
         <el-form-item label="用户类型" prop="type">
           <el-input v-model="form.type" placeholder="请输入用户类型" />
         </el-form-item>
@@ -149,7 +137,11 @@
           <el-input v-model="form.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="可见范围" prop="ground">
-          <el-input v-model="form.ground" placeholder="请输入可见范围" />
+          <!-- <el-input v-model="form.ground" placeholder="请输入可见范围" /> -->
+          <el-select v-model="form.ground" multiple placeholder="请选择可见范围">
+            <el-option v-for="(item, index) in equipmentName" :key="index" :label="item.label" :value="equipmentName[index]">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,11 +154,14 @@
 
 <script>
 import { listUser, getUser, delUser, addUser, updateUser } from "@/api/iot/user";
+import { getDeviceName } from "@/api/iot/deviceConfig";
 
 export default {
   name: "User",
   data() {
     return {
+      // 设备名称
+      equipmentName: [],
       // 按钮loading
       buttonLoading: false,
       // 遮罩层
@@ -192,7 +187,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         username: undefined,
-        password: undefined,
+        // password: undefined,
         type: undefined,
         phone: undefined,
         email: undefined,
@@ -207,9 +202,6 @@ export default {
         ],
         username: [
           { required: true, message: "用户名不能为空", trigger: "blur" }
-        ],
-        password: [
-          { required: true, message: "密码不能为空", trigger: "blur" }
         ],
         type: [
           { required: true, message: "用户类型不能为空", trigger: "change" }
@@ -228,6 +220,11 @@ export default {
   },
   created() {
     this.getList();
+    getDeviceName().then(res=> {
+      if(res.data) {
+        this.equipmentName = res.data
+      }
+    })
   },
   methods: {
     /** 查询用户列表 */
@@ -249,7 +246,7 @@ export default {
       this.form = {
         userId: undefined,
         username: undefined,
-        password: undefined,
+        // password: undefined,
         type: undefined,
         phone: undefined,
         email: undefined,
@@ -310,6 +307,8 @@ export default {
             });
           } else {
             addUser(this.form).then(response => {
+              console.log(response, 111111)
+
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();

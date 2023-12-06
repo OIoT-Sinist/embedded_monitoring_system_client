@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="co2" prop="co2">
+      <el-form-item label-width="100px" label="co2" prop="co2">
         <el-input
           v-model="queryParams.co2"
           placeholder="请输入co2"
@@ -9,7 +9,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="亮度" prop="luminance">
+      <el-form-item label-width="100px" label="亮度" prop="luminance">
         <el-input
           v-model="queryParams.luminance"
           placeholder="请输入亮度"
@@ -17,7 +17,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="湿度" prop="humidity">
+      <el-form-item label-width="100px" label="湿度" prop="humidity">
         <el-input
           v-model="queryParams.humidity"
           placeholder="请输入湿度"
@@ -25,7 +25,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="温度" prop="temprature">
+      <el-form-item label-width="100px" label="温度" prop="temprature">
         <el-input
           v-model="queryParams.temprature"
           placeholder="请输入温度"
@@ -33,7 +33,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="自定义数据" prop="customData">
+      <el-form-item label-width="100px" label="自定义数据" prop="customData">
         <el-input
           v-model="queryParams.customData"
           placeholder="请输入自定义数据"
@@ -131,7 +131,7 @@
 
     <!-- 添加或修改物联网设备数据传输对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="co2" prop="co2">
           <el-input v-model="form.co2" placeholder="请输入co2" />
         </el-form-item>
