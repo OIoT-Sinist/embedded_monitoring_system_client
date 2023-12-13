@@ -42,3 +42,11 @@ export function delDeviceConfig(id) {
     method: 'delete'
   })
 }
+
+// 设备名
+export function getDeviceName() {
+  return request({
+    url: '/iot/deviceConfig/getDeviceName',
+    method: 'get'
+  })
+}
