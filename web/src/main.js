@@ -40,16 +40,6 @@ import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
-// 引入高德地图
-// import AMapLoader from "@amap/amap-jsapi-loader"
-// AMapLoader.load({
-//   key: "e70997f50b4c02bfc3fe258a67222adf",
-//   version: "2.0",
-//   plugins: ["AMap.Scale"],
-// }).then((AMap)=>{
-//   Vue.use(AMap);
-// });
-
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
